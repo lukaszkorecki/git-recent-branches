@@ -19,7 +19,7 @@ c1=$(tput setaf 7)
 c2=$(tput setaf 5)
 coff=$(tput sgr0)
 
-filter=$( [ ! "$1" = "-r" ] && echo "refs/heads/" || "")
+[ "$1" = "-r" ] && filter="" || filter="refs/heads/"
 
 git for-each-ref \
   --sort=-committerdate   \
