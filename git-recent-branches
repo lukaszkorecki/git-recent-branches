@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 ## Show recently changed branches locally (and remotely)
 ## Options:
-## -r - include remote branches (better if you run git fetch first)
-## -h - this
+##     -r - include remote branches (better if you run git fetch first)
+##     -h - this
+## Symbols:
+##     ▼ - local
+##     ▲  - remote
+
+# TODO
+# ❒ - tag
+# ☂  - stash
 
 if [ "$1" = "-h" ] ; then
   p=$(which $(basename $0))
@@ -19,7 +26,9 @@ c1=$(tput setaf 7)
 c2=$(tput setaf 5)
 coff=$(tput sgr0)
 
-[ "$1" = "-r" ] && filter="" || filter="refs/heads/"
+# TODO support tags and stashes with -t and -s
+[ "$1" = "-r" ] && filter="refs/remotes/ refs/heads/" || filter="refs/heads/"
+
 
 git for-each-ref \
   --sort=-committerdate   \
@@ -30,9 +39,13 @@ git for-each-ref \
 while read line
 do
   eval "$line"
-  message=$(git show --pretty='format:%s' $commit | tr "\n" ' ')
+  message=$(git show --pretty='format:%s' $commit | head -1 | tr "\n" ' ')
   # L for local branch, R for remote branch
-  branch=$(echo "$branch" |  sed -e "s/refs.heads./▼ /g" -e "s/refs.remotes.\w*\//▲ /g"  )
+  branch=$(echo "$branch" |  sed -e "s/refs.heads./▼ /g" \
+    -e "s/refs.remotes.\w*\//▲ /g"  )
+
+  # -e "s/refs.tags./❒ /g" \
+  # -e "s/refs.stash/☂ /g")
 
   printf "%s%s%s%s| %s | %s%.6s%s | %.60s...\n" \
     $b1 $c1 "$branch" $coff \
