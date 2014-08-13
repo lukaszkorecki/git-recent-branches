@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+## Show recently changed branches locally (and remotely)
+## Options:
+## -r - include remote branches (better if you run git fetch first)
+## -h - this
+
+if [ "$1" = "-h" ] ; then
+  p=$(which $(basename $0))
+  grep '^##' $p | sed "s/## //g"
+  exit 0
+fi
+
+tmplog=/tmp/$RANDOM.recent.log
+
+trap "rm $tmplog; exit" SIGHUP SIGINT SIGTERM
+
+b1=$(tput setab 0)
+c1=$(tput setaf 7)
+c2=$(tput setaf 5)
+coff=$(tput sgr0)
+
+filter=$( [ ! "$1" = "-r" ] && echo "refs/heads/" || "")
+
+git for-each-ref \
+  --sort=-committerdate   \
+  --shell \
+  --format="branch=%(refname) commit=%(objectname) reltime=%(committerdate:relative)" \
+  $filter | sort > $tmplog
+
+while read line
+do
+  eval "$line"
+  message=$(git show --pretty='format:%s' $commit | tr "\n" ' ')
+  # L for local branch, R for remote branch
+  branch=$(echo "$branch" |  sed -e "s/refs.heads./▼ /g" -e "s/refs.remotes.\w*\//▲ /g"  )
+
+  printf "%s%s%s%s| %s | %s%.6s%s | %.60s...\n" \
+    $b1 $c1 "$branch" $coff \
+    "$reltime" \
+    $c2 $commit $coff "$message"
+
+done < $tmplog
