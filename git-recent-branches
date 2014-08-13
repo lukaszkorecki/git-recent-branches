@@ -36,18 +36,18 @@ git for-each-ref \
   --format="branch=%(refname) commit=%(objectname) reltime=%(committerdate:relative)" \
   $filter | sort > $tmplog
 
-while read line
+while read -r line
 do
   eval "$line"
   message=$(git show --pretty='format:%s' $commit | head -1 | tr "\n" ' ')
-  # L for local branch, R for remote branch
+  # reformat refs into symbols
   branch=$(echo "$branch" |  sed -e "s/refs.heads./▼ /g" \
     -e "s/refs.remotes.\w*\//▲ /g"  )
 
   # -e "s/refs.tags./❒ /g" \
   # -e "s/refs.stash/☂ /g")
 
-  printf "%s%s%s%s| %s | %s%.6s%s | %.60s...\n" \
+  printf "%s%s%s%s | %s | %s%.6s%s | %.60s...\n" \
     $b1 $c1 "$branch" $coff \
     "$reltime" \
     $c2 $commit $coff "$message"
