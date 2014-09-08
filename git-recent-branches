@@ -10,6 +10,7 @@
 # TODO
 # ❒ - tag
 # ☂  - stash
+# - short formmat (branch name / sha)
 
 if [ "$1" = "-h" ] ; then
   p=$(which $(basename $0))
@@ -21,9 +22,8 @@ tmplog=/tmp/$RANDOM.recent.log
 
 trap "rm $tmplog; exit" SIGHUP SIGINT SIGTERM
 
-b1=$(tput setab 0)
-c1=$(tput setaf 7)
-c2=$(tput setaf 5)
+c1=$(tput setaf 2)
+c2=$(tput setaf 3)
 coff=$(tput sgr0)
 
 # TODO support tags and stashes with -t and -s
@@ -47,8 +47,8 @@ do
   # -e "s/refs.tags./❒ /g" \
   # -e "s/refs.stash/☂ /g")
 
-  printf "%s%s%s%s | %s | %s%.6s%s | %.60s...\n" \
-    $b1 $c1 "$branch" $coff \
+  printf "%s%s%s | %s | %s%.6s%s | %.60s...\n" \
+    $c1 "$branch" $coff \
     "$reltime" \
     $c2 $commit $coff "$message"
 
