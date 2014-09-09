@@ -34,7 +34,7 @@ git for-each-ref \
   --sort=-committerdate   \
   --shell \
   --format="branch=%(refname) commit=%(objectname) reltime=%(committerdate:relative)" \
-  $filter | sort > $tmplog
+  $filter  > $tmplog
 
 while read -r line
 do
