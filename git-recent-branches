@@ -18,6 +18,11 @@ if [ "$1" = "-h" ] ; then
   exit 0
 fi
 
+limit="tee"
+if [ "$1" != "" ] ; then
+  limit="head -$1"
+fi
+
 tmplog=/tmp/$RANDOM.recent.log
 
 trap "rm $tmplog; exit" SIGHUP SIGINT SIGTERM
@@ -34,7 +39,7 @@ git for-each-ref \
   --sort=-committerdate   \
   --shell \
   --format="branch=%(refname) commit=%(objectname) reltime=%(committerdate:relative)" \
-  $filter  > $tmplog
+  $filter |  $limit > $tmplog
 
 while read -r line
 do
